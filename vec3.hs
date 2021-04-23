@@ -3,7 +3,7 @@ module V3 where
 
 type V3 = (Double, Double, Double)
 
-
+-- Vector utilities
 norm :: V3 -> Double
 norm (x, y, z) = sqrt (x ^ 2 + y ^ 2 + z ^ 2)
 
@@ -35,3 +35,10 @@ cross (x1, y1, z1) (x2, y2, z2) = (y1 * z2 - z1 * y2,
 
 unitv :: V3 -> V3
 unitv (x, y, z) = divscalar (x, y, z) (norm (x, y, z))
+
+
+-- Colour definition
+type C3 = V3
+
+writec :: C3 -> String
+writec (x, y, z) = show (floor x) ++ " " ++ show (floor y) ++ " " ++ show (floor z)
