@@ -1,44 +1,44 @@
-module V3 where
+module Vec3 where
 
 
-type V3 = (Double, Double, Double)
+type Vec3 = (Double, Double, Double)
 
 -- Vector utilities
-norm :: V3 -> Double
+norm :: Vec3 -> Double
 norm (x, y, z) = sqrt (x ^ 2 + y ^ 2 + z ^ 2)
 
-coord :: V3 -> Int -> Double
+coord :: Vec3 -> Int -> Double
 coord (x, y, z) 0 = x
 coord (x, y, z) 1 = y
 coord (x, y, z) 2 = z
 coord (x, y, z) _ = error "dimension not defined"
 
-mulscalar :: V3 -> Double -> V3
+mulscalar :: Vec3 -> Double -> Vec3
 mulscalar (x, y, z) i = (x * i, y * i, z * i)
 
-divscalar :: V3 -> Double -> V3
+divscalar :: Vec3 -> Double -> Vec3
 divscalar (x, y, z) i = mulscalar (x, y, z) (1 / i)
 
-sumv :: V3 -> V3 -> V3
+sumv :: Vec3 -> Vec3 -> Vec3
 sumv (x1, y1, z1) (x2, y2, z2) = (x1 + x2, y1 + y2, z1 + z2)
 
-subv :: V3 -> V3 -> V3
+subv :: Vec3 -> Vec3 -> Vec3
 subv (x1, y1, z1) (x2, y2, z2) = sumv (x1, y1, z1) (mulscalar (x2, y2, z2) (-1))
 
-dot :: V3 -> V3 -> Double
+dot :: Vec3 -> Vec3 -> Double
 dot (x1, y1, z1) (x2, y2, z2) = x1 * x2 + y1 * y2 + z1 * z2
 
-cross :: V3 -> V3 -> V3
+cross :: Vec3 -> Vec3 -> Vec3
 cross (x1, y1, z1) (x2, y2, z2) = (y1 * z2 - z1 * y2,
                                    z1 * x2 - x1 * z2,
                                    x1 * y2 - y1 * x2)
 
-unitv :: V3 -> V3
+unitv :: Vec3 -> Vec3
 unitv (x, y, z) = divscalar (x, y, z) (norm (x, y, z))
 
 
 -- Colour definition
-type C3 = V3
+type C3 = Vec3
 
 writec :: C3 -> String
 writec (x, y, z) = show (floor x) ++ " " ++ show (floor y) ++ " " ++ show (floor z)
