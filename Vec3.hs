@@ -41,4 +41,4 @@ unitv (x, y, z) = divscalar (x, y, z) (norm (x, y, z))
 type C3 = Vec3
 
 writec :: C3 -> String
-writec (x, y, z) = show (floor x) ++ " " ++ show (floor y) ++ " " ++ show (floor z)
+writec (x, y, z) = show (floor (255 * x)) ++ " " ++ show (floor (255 * y)) ++ " " ++ show (floor (255 * z))
