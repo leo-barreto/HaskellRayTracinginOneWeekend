@@ -36,19 +36,23 @@ ppmHeader file = do
 
 raycolour :: Ray -> C3
 raycolour r
-  | hs == True = (1, 0, 0)
+  | hs > 0 = ((coord n 0) + 1, (coord n 1) + 1, (coord n 2) + 1) `divscalar` 2
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
-  where u = unitv(direction r)
+  where n = unitv ((dirat r hs) `subv` (0, 0, -1))
+        u = unitv (direction r)
         t = 0.5 * ((coord u 1) + 1)
         hs = hitsphere (0, 0, -1) 0.5 r
 
 
-hitsphere :: Vec3 -> Double -> Ray -> Bool
-hitsphere center radius r = (b ** 2 - 4 * a * c) > 0
-                            where oc = (origin r) `subv` center
-                                  a = (direction r) `dot` (direction r)
-                                  b = 2 * (oc `dot` (direction r))
-                                  c = (oc `dot` oc) - radius ** 2
+hitsphere :: Vec3 -> Double -> Ray -> Double
+hitsphere center radius r
+  | discriminant < 0 = -1
+  | otherwise = (-bh - sqrt(discriminant)) / a
+  where oc = (origin r) `subv` center
+        a = (direction r) `dot` (direction r)
+        bh = oc `dot` (direction r)
+        c = (oc `dot` oc) - radius ** 2
+        discriminant = bh ** 2 - a * c
 
 
 
