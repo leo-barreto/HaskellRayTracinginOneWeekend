@@ -9,3 +9,8 @@ data HitRecord = HitRecord { p :: Vec3
 
 hit :: Ray -> Double -> Double -> HitRecord -> Bool
 hit r tmin tmax hr = False
+
+setfacenormal :: Ray -> Vec3 -> Vec3
+setfacenormal r outward
+  | dot (direction r) outward > 0 = outward
+  | otherwise = outward `mulscalar` (-1)
