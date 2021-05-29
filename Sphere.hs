@@ -7,8 +7,8 @@ import Hittable
 data Sphere = Sphere { center :: Vec3
                      , radius :: Double } deriving Show
 
-hitsphere :: Sphere -> Ray -> Double -> Double -> HitRecord -> Bool
-hitsphere s r tmin tmax hr
+hitsphere :: Sphere -> Ray -> Double -> Double -> Bool
+hitsphere s r tmin tmax
   | discriminant < 0 = False
   | (notinrange rootminus tmin tmax) && (notinrange rootplus tmin tmax) = False
   | otherwise = True
@@ -20,11 +20,8 @@ hitsphere s r tmin tmax hr
         rootminus = (-bh - sqrt(discriminant)) / a
         rootplus = (-bh + sqrt(discriminant)) / a
 
-notinrange :: Double -> Double -> Double -> Bool
-notinrange root tmin tmax = (root < tmin || tmax < root)
-
-newhitrecord :: Sphere -> Ray -> Double -> Double -> HitRecord -> HitRecord
-newhitrecord s r tmin tmax hr
+hitrecsphere :: Sphere -> Ray -> Double -> Double -> HitRecord -> HitRecord
+hitrecsphere s r tmin tmax hr
   | hitsphere s r tmin tmax = newhr
   | otherwise = hr
   -- Results calculated before in hitsphere, how can I get those?
@@ -37,10 +34,10 @@ newhitrecord s r tmin tmax hr
         rootplus = (-bh + sqrt(discriminant)) / a
         -- New calculations
         root
-          | not isnotrootminus = rootminus
+          | not isrootminus = rootminus
           | otherwise = rootplus
           where isrootminus = notinrange rootminus tmin tmax
         newp = dirat r root
         outward_normal = (newp `subv` (center s)) `divscalar` (radius s)
         newt = root
-        newhr = HitRecord {newp, setfacenormal r outward_normal, newt}
+        newhr = HitRecord newp (setfacenormal r outward_normal) newt

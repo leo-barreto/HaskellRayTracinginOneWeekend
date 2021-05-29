@@ -3,12 +3,13 @@ module Hittable where
 import Vec3
 import Ray
 
+
 data HitRecord = HitRecord { p :: Vec3
                            , normal :: Vec3
                            , t :: Double } deriving Show
 
-hit :: Ray -> Double -> Double -> HitRecord -> Bool
-hit r tmin tmax hr = False
+notinrange :: Double -> Double -> Double -> Bool
+notinrange root tmin tmax = (root < tmin || tmax < root)
 
 setfacenormal :: Ray -> Vec3 -> Vec3
 setfacenormal r outward
