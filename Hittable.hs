@@ -24,6 +24,22 @@ hitrec (Sphere center radius) r tmin tmax hr = hitrecsphere (Sphere center radiu
 hitrec _ r tmin tmax hr = hr
 
 
+-- Hittable list
+anyhitrec :: [Hittable] -> Ray -> Double -> Double -> HitRecord -> HitRecord
+anyhitrec [] r tmin tmax hr = hr
+anyhitrec [a] r tmin tmax hr = hitrec a r tmin tmax hr
+anyhitrec (a:as) r tmin tmax hr
+  | hit a r tmin tmax hr == True = anyhitrec as r tmin newtmax newhr
+  | otherwise = anyhitrec as r tmin tmax hr
+  where newhr = hitrec a r tmin tmax hr
+        newtmax = t newhr
+
+anyhit :: [Hittable] -> Ray -> Double -> Double -> HitRecord -> Bool
+anyhit la r tmin tmax hr
+  | hr == anyhitrec la r tmin tmax hr = False
+  | otherwise = True
+
+
 -- Sphere
 hitrecsphere :: Hittable -> Ray -> Double -> Double -> HitRecord -> HitRecord
 hitrecsphere s r tmin tmax hr
