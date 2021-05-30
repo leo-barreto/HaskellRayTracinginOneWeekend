@@ -75,5 +75,5 @@ notinrange root tmin tmax = (root < tmin || tmax < root)
 
 setfacenormal :: Ray -> Vec3 -> Vec3
 setfacenormal r outward
-  | dot (direction r) outward > 0 = outward
-  | otherwise = outward `mulscalar` (-1)
+  | dot (direction r) outward > 0 = outward `mulscalar` (-1)
+  | otherwise = outward

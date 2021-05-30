@@ -45,7 +45,7 @@ ppmHeader file = do
 
 raycolour :: [Hittable] -> Ray -> HitRecord -> C3
 raycolour la r hr
-  | anyhit la r 0 infty hr == True = ((normal newhr) `sumv` (1, 1, 1)) `divscalar` 3
+  | anyhit la r 0 infty hr == True = ((normal newhr) `sumv` (1, 1, 1)) `divscalar` 2
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
   where u = unitv (direction r)
         t = 0.5 * ((coord u 1) + 1)
