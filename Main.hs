@@ -13,6 +13,7 @@ aspect_ratio = 16 / 9
 image_width = 400
 image_height = image_width / aspect_ratio
 max_colour = 255
+samples_per_pixel = 100
 
 -- Camera
 vp_height = 2
@@ -35,7 +36,7 @@ gradient (x, y) = do
                   let v1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                       v2 = (vertical `mulscalar` y) `subv` origin_cam
                       hrbase = HitRecord (0, 0, 0) (0, 0, 0) 0
-                  writec (raycolour world (Ray origin_cam (v1 `sumv` v2)) hrbase)
+                  writec (raycolour world (Ray origin_cam (v1 `sumv` v2)) hrbase) samples_per_pixel
 
 
 ppmHeader file = do

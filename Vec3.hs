@@ -40,5 +40,17 @@ unitv (x, y, z) = divscalar (x, y, z) (norm (x, y, z))
 -- Colour definition
 type C3 = Vec3
 
-writec :: C3 -> String
-writec (x, y, z) = show (floor (255 * x)) ++ " " ++ show (floor (255 * y)) ++ " " ++ show (floor (255 * z))
+-- writec :: C3 -> String
+-- writec (x, y, z) = show (floor (255 * x)) ++ " " ++ show (floor (255 * y)) ++ " " ++ show (floor (255 * z))
+
+writec :: C3 -> Double -> String
+writec (r, g, b) samples = (show scaledr) ++ " " ++ (show scaledg) ++ " " ++ (show scaledb)
+                           where scaledr = floor (256 * (clamp (r / samples) 0 0.999))
+                                 scaledg = floor (256 * (clamp (g / samples) 0 0.999))
+                                 scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+
+clamp :: Double -> Double -> Double -> Double
+clamp x lower upper
+  | x < lower = lower
+  | x > upper = upper
+  | otherwise = x
