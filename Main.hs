@@ -1,9 +1,13 @@
 import System.IO
 import Vec3
 import Ray
+import Hittable
 
 
 -- Variable definitions
+-- Math
+infty = 1 / 0
+
 -- Image
 aspect_ratio = 16 / 9
 image_width = 400
@@ -20,13 +24,18 @@ vertical = (0, vp_height, 0)
 lower_left_corner = v1 `subv` v2 where v1 = origin_cam `subv` (divscalar horizontal 2)
                                        v2 = (divscalar vertical 2) `sumv` (0, 0, focal_len)
 
+-- World
+mainsphere = Sphere (0, 0, -1) 0.5
+bgdsphere = Sphere (0, -100.5, -1) 100
+world = [mainsphere, bgdsphere]
 
 -- Auxiliary functions
 gradient :: (Double, Double) -> String
 gradient (x, y) = do
                   let v1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                       v2 = (vertical `mulscalar` y) `subv` origin_cam
-                  writec (raycolour (Ray origin_cam (v1 `sumv` v2)))
+                      hrbase = HitRecord (0, 0, 0) (0, 0, 0) 0
+                  writec (raycolour world (Ray origin_cam (v1 `sumv` v2)) hrbase)
 
 
 ppmHeader file = do
@@ -34,26 +43,13 @@ ppmHeader file = do
                  appendFile file ("\n" ++ show (round max_colour) ++ "\n")
 
 
-raycolour :: Ray -> C3
-raycolour r
-  | hs > 0 = ((coord n 0) + 1, (coord n 1) + 1, (coord n 2) + 1) `divscalar` 2
+raycolour :: [Hittable] -> Ray -> HitRecord -> C3
+raycolour la r hr
+  | anyhit la r 0 infty hr == True = ((normal newhr) `sumv` (1, 1, 1)) `divscalar` 3
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
-  where n = unitv ((dirat r hs) `subv` (0, 0, -1))
-        u = unitv (direction r)
+  where u = unitv (direction r)
         t = 0.5 * ((coord u 1) + 1)
-        hs = hitsphere (0, 0, -1) 0.5 r
-
-
-hitsphere :: Vec3 -> Double -> Ray -> Double
-hitsphere center radius r
-  | discriminant < 0 = -1
-  | otherwise = (-bh - sqrt(discriminant)) / a
-  where oc = (origin r) `subv` center
-        a = (direction r) `dot` (direction r)
-        bh = oc `dot` (direction r)
-        c = (oc `dot` oc) - radius ** 2
-        discriminant = bh ** 2 - a * c
-
+        newhr = anyhitrec la r 0 infty hr
 
 
 main = do
