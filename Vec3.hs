@@ -45,9 +45,12 @@ type C3 = Vec3
 
 writec :: C3 -> Double -> String
 writec (r, g, b) samples = (show scaledr) ++ " " ++ (show scaledg) ++ " " ++ (show scaledb)
-                           where scaledr = floor (256 * (clamp (r / samples) 0 0.999))
-                                 scaledg = floor (256 * (clamp (g / samples) 0 0.999))
-                                 scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+--                           where scaledr = floor (256 * (clamp (r / samples) 0 0.999))
+--                                 scaledg = floor (256 * (clamp (g / samples) 0 0.999))
+--                                 scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+                           where scaledr = floor (256 * (clamp (r) 0 0.999))
+                                 scaledg = floor (256 * (clamp (g) 0 0.999))
+                                 scaledb = floor (256 * (clamp (b) 0 0.999))
 
 clamp :: Double -> Double -> Double -> Double
 clamp x lower upper

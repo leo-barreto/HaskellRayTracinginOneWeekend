@@ -26,7 +26,7 @@ gradient (x, y) = do
                   let v1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                       v2 = (vertical `mulscalar` y) `subv` origin_cam
                       hrbase = HitRecord (0, 0, 0) (0, 0, 0) 0
-                  writec (raycolour world (get_ray x y) hrbase) samples_per_pixel
+                  writec (raycolour world (get_ray (x, y)) hrbase) samples_per_pixel
 
 
 ppmHeader file = do
@@ -50,3 +50,4 @@ main = do
            colour_grady = [0..image_height - 1]
            elements = [(x / (image_width - 1), y / (image_height - 1)) | y <- reverse colour_grady, x <- colour_gradx]
        appendFile "test.ppm" (unlines (map gradient elements))
+       putStrLn "ppm file created!"
