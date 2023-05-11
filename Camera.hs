@@ -16,8 +16,8 @@ vertical = (0, vp_height, 0)
 lower_left_corner = v1 `subv` v2 where v1 = origin_cam `subv` (divscalar horizontal 2)
                                        v2 = (divscalar vertical 2) `sumv` (0, 0, focal_len)
 
--- 
-get_ray :: (Double, Double) -> Ray
-get_ray (x, y) = Ray origin_cam (a1 `sumv` a2)
+-- Generate rays from camera 
+getray :: (Double, Double) -> Ray
+getray (x, y) = Ray origin_cam (a1 `sumv` a2)
                  where a1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                        a2 = (vertical `mulscalar` y) `subv` origin_cam

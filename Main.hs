@@ -5,6 +5,7 @@ import Hittable
 import Camera
 
 
+
 -- Variable definitions
 -- Math
 infty = 1 / 0
@@ -26,7 +27,7 @@ gradient (x, y) = do
                   let v1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                       v2 = (vertical `mulscalar` y) `subv` origin_cam
                       hrbase = HitRecord (0, 0, 0) (0, 0, 0) 0
-                  writec (raycolour world (get_ray (x, y)) hrbase) samples_per_pixel
+                  writec (raycolour world (getray (x, y)) hrbase) samples_per_pixel
 
 
 ppmHeader file = do
@@ -43,11 +44,16 @@ raycolour la r hr
         newhr = anyhitrec la r 0 infty hr
 
 
+
+-- Main function 
 main = do
        -- Render
        ppmHeader "test.ppm"
+
        let colour_gradx = [0..image_width - 1]
            colour_grady = [0..image_height - 1]
            elements = [(x / (image_width - 1), y / (image_height - 1)) | y <- reverse colour_grady, x <- colour_gradx]
+
        appendFile "test.ppm" (unlines (map gradient elements))
        putStrLn "ppm file created!"
+
