@@ -21,3 +21,8 @@ getray :: (Double, Double) -> Ray
 getray (x, y) = Ray origin_cam (a1 `sumv` a2)
                  where a1 = lower_left_corner `sumv` (horizontal `mulscalar` x)
                        a2 = (vertical `mulscalar` y) `subv` origin_cam
+
+
+-- Multiple samples for anti-aliasing
+getshiftedray :: (Double, Double) -> (Double, Double) -> Ray
+getshiftedray (x, y) (i, j) = getray ((x + i), (y + j))
