@@ -1,5 +1,7 @@
 module Vec3 where
 
+import System.Random
+
 
 type Vec3 = (Double, Double, Double)
 
@@ -39,6 +41,14 @@ unitv (x, y, z) = divscalar (x, y, z) (norm (x, y, z))
 sumvectorarray :: [Vec3] -> Vec3
 sumvectorarray [] = (0, 0, 0)
 sumvectorarray (x:xs) = x `sumv`(sumvectorarray xs)
+
+-- Random vector
+randomvec :: (Double, Double) -> StdGen -> Vec3
+randomvec (min, max) randgen = (x, y, z)
+                               where [x, y, z] = take 3 (randomRs (min, max) randgen)
+
+randomuvec :: StdGen -> Vec3
+randomuvec randgen = unitv (randomvec (-1.0, 1.0) randgen)
 
 
 -- Colour definition
