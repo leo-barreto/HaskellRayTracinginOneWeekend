@@ -43,22 +43,34 @@ sumvectorarray [] = (0, 0, 0)
 sumvectorarray (x:xs) = x `sumv`(sumvectorarray xs)
 
 -- Random vector
-randomvec :: (Double, Double) -> StdGen -> Vec3
-randomvec (min, max) randgen = (x, y, z)
-                               where [x, y, z] = take 3 (randomRs (min, max) randgen)
+--randomvec :: (Double, Double) -> StdGen -> Vec3
+--randomvec (min, max) randgen = (x, y, z)
+--                               where [x, y, z] = take 3 (randomRs (min, max) randgen)
 
-randomuvec :: StdGen -> Vec3
-randomuvec randgen = unitv (randomvec (-1.0, 1.0) randgen)
+randomvec :: (Double, Double) -> IO Vec3
+randomvec (min, max) = do
+                       randgen <- newStdGen
+                       let [x, y, z] = take 3 (randomRs (min, max) randgen)
+                       return (x, y, z)
 
+--randomuvec :: StdGen -> Vec3
+--randomuvec randgen = unitv (randomvec (-1.0, 1.0) randgen)
+
+randomuvec :: IO Vec3
+randomuvec = do
+             v <- randomvec(-1.0, 1.0)
+             return (unitv v)
 
 -- Colour definition
 type C3 = Vec3
 
-writec :: C3 -> Double -> String
-writec (r, g, b) samples = (show scaledr) ++ " " ++ (show scaledg) ++ " " ++ (show scaledb)
-                           where scaledr = floor (256 * (clamp (r / samples) 0 0.999))
-                                 scaledg = floor (256 * (clamp (g / samples) 0 0.999))
-                                 scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+writec :: C3 -> Double -> IO String
+writec (r, g, b) samples = do
+                           let scaledr = floor (256 * (clamp (r / samples) 0 0.999))
+                               scaledg = floor (256 * (clamp (g / samples) 0 0.999))
+                               scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+                           return $ (show scaledr) ++ " " ++ (show scaledg) ++ " " ++ (show scaledb)
+
 
 clamp :: Double -> Double -> Double -> Double
 clamp x lower upper
