@@ -58,7 +58,7 @@ randomarray samples randgen = take samples (randomRs ((0.0, 0.0), (1.0 / image_w
 raycolour :: [Hittable] -> Ray -> HitRecord -> [Vec3] -> Int -> C3
 raycolour la r hr rvecs depth
   | depth <= 0 = (0, 0, 0)
-  | anyhit la r 0 infty hr == True = (raycolour la newray hr rvecs (depth - 1)) `divscalar` 2
+  | anyhit la r 0.001 infty hr == True = (raycolour la newray hr rvecs (depth - 1)) `divscalar` 2
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
   where newhr = anyhitrec la r 0 infty hr
         rvec = rvecs !! (depth - 1)

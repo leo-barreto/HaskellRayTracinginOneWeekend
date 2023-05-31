@@ -73,9 +73,14 @@ type C3 = Vec3
 
 writec :: C3 -> Double -> IO String
 writec (r, g, b) samples = do
-                           let scaledr = floor (256 * (clamp (r / samples) 0 0.999))
-                               scaledg = floor (256 * (clamp (g / samples) 0 0.999))
-                               scaledb = floor (256 * (clamp (b / samples) 0 0.999))
+                           -- Gamma = 2 correction and multiple samples
+                           let gammar = sqrt $ r / samples
+                               gammag = sqrt $ g / samples
+                               gammab = sqrt $ b / samples
+                               
+                               scaledr = floor (256 * (clamp gammar 0 0.999))
+                               scaledg = floor (256 * (clamp gammag 0 0.999))
+                               scaledb = floor (256 * (clamp gammab 0 0.999))
                            return $ (show scaledr) ++ " " ++ (show scaledg) ++ " " ++ (show scaledb)
 
 
