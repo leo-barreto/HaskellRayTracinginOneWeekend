@@ -13,29 +13,39 @@ import Camera
 -- Math
 infty = 1 / 0
 
+
 -- Image
 image_width = 400
 image_height = image_width / aspect_ratio
 max_colour = 255
 samples_per_pixel = 20 :: Double
+max_depth = 50
+
 
 -- World
 mainsphere = Sphere (0, 0, -1) 0.5
 bgdsphere = Sphere (0, -100.5, -1) 100
 world = [mainsphere, bgdsphere]
 
+
 -- Auxiliary functions
 gradient :: (Double, Double) -> IO String
 gradient (x, y) = do
+                 
+                  -- List of random arrays for diffuse material
+                  randomunitvs <- replicateM max_depth randomuvec
+                  
+                  -- Seed for anti-aliasing (aa)
                   randgen <- newStdGen
-                  let random2darray = randomarray (floor samples_per_pixel) randgen
+ 
+                  let aa_array = randomarray (floor samples_per_pixel) randgen
                       hrbase = HitRecord (0, 0, 0) (0, 0, 0) 0
                                
                       -- Array of all shifted rays
-                      mappedshiftedrays = map (\arg -> getshiftedray (x, y) arg) random2darray
+                      mappedshiftedrays = map (\arg -> getshiftedray (x, y) arg) aa_array
 
                       -- Array of all colours
-                      mappedcolours = map (\arg -> raycolour world arg hrbase) mappedshiftedrays
+                      mappedcolours = map (\arg -> raycolour world arg hrbase randomunitvs max_depth) mappedshiftedrays
 
                   writec (sumvectorarray mappedcolours) samples_per_pixel
 
@@ -45,31 +55,31 @@ randomarray :: Int -> StdGen -> [(Double, Double)]
 randomarray samples randgen = take samples (randomRs ((0.0, 0.0), (1.0 / image_width, 1.0 / image_height)) randgen)
 
 
-ppmHeader file = do
-                 writeFile file ("P3\n" ++ show (round image_width) ++ " " ++ show (round image_height))
-                 appendFile file ("\n" ++ show (round max_colour) ++ "\n")
-
-
-raycolour :: [Hittable] -> Ray -> HitRecord -> C3
-raycolour la r hr 
-  | anyhit la r 0 infty hr == True = ((normal newhr) `sumv` (p newhr)) `divscalar` 2
+raycolour :: [Hittable] -> Ray -> HitRecord -> [Vec3] -> Int -> C3
+raycolour la r hr rvecs depth
+  | depth <= 0 = (0, 0, 0)
+  | anyhit la r 0 infty hr == True = (raycolour la newray hr rvecs (depth - 1)) `divscalar` 2
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
-  where u = unitv (direction r)
+  where newhr = anyhitrec la r 0 infty hr
+        rvec = rvecs !! (depth - 1)
+        target = ((normal newhr) `sumv` (p newhr)) `sumv` rvec
+        newray = Ray (p newhr) (target `subv` (p newhr))
+        u = unitv (direction r)
         t = 0.5 * ((coord u 1) + 1)
-        newhr = anyhitrec la r 0 infty hr
 
 
 mappedgrad :: [(Double, Double)] -> IO [String]
 mappedgrad array = sequenceA (map (\arg -> gradient arg) array)
 
 
+ppmHeader file = do
+                 writeFile file ("P3\n" ++ show (round image_width) ++ " " ++ show (round image_height))
+                 appendFile file ("\n" ++ show (round max_colour) ++ "\n")
+
 -- Main function 
 main = do
        -- Render
        ppmHeader "test.ppm"
-
-       -- Random seed
-       randgen <- newStdGen
 
        -- Set pixels
        let colour_gradx = [0..image_width - 1]
