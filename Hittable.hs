@@ -35,9 +35,10 @@ anyhitrec (a:as) r tmin tmax hr
         newtmax = t newhr
 
 anyhit :: [Hittable] -> Ray -> Double -> Double -> HitRecord -> Bool
-anyhit la r tmin tmax hr
-  | hr == anyhitrec la r tmin tmax hr = False
-  | otherwise = True
+anyhit [] r tmin tmax hr = False
+anyhit (a:as) r tmin tmax hr
+  | hit a r tmin tmax hr = True
+  | otherwise = anyhit as r tmin tmax hr
 
 
 -- Sphere
@@ -65,8 +66,16 @@ hitrecsphere s r tmin tmax hr
 
 hitsphere :: Hittable -> Ray -> Double -> Double -> HitRecord -> Bool
 hitsphere s r tmin tmax hr
-  | hr == hitrecsphere s r tmin tmax hr = False
+  | discriminant < 0 = False
+  | notinrange rootminus tmin tmax && notinrange rootplus tmin tmax = False
   | otherwise = True
+  where oc = (origin r) `subv` (center s)
+        a = (direction r) `dot` (direction r)
+        bh = oc `dot` (direction r)
+        c = (oc `dot` oc) - (radius s) ** 2
+        discriminant = bh ** 2 - a * c
+        rootminus = (-bh - sqrt(discriminant)) / a
+        rootplus = (-bh + sqrt(discriminant)) / a
 
 
 -- Auxiliary functions

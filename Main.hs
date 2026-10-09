@@ -15,8 +15,8 @@ infty = 1 / 0
 
 
 -- Image
-image_width = 400
-image_height = image_width / aspect_ratio
+image_width = 400 :: Int
+image_height = round (fromIntegral image_width / aspect_ratio) :: Int
 max_colour = 255
 samples_per_pixel = 20 :: Double
 max_depth = 50
@@ -52,7 +52,7 @@ gradient (x, y) = do
 
 -- Generate random (i, j) list
 randomarray :: Int -> StdGen -> [(Double, Double)]
-randomarray samples randgen = take samples (randomRs ((0.0, 0.0), (1.0 / image_width, 1.0 / image_height)) randgen)
+randomarray samples randgen = take samples (randomRs ((0.0, 0.0), (1.0 / fromIntegral image_width, 1.0 / fromIntegral image_height)) randgen)
 
 
 raycolour :: [Hittable] -> Ray -> HitRecord -> [Vec3] -> Int -> C3
@@ -60,7 +60,7 @@ raycolour la r hr rvecs depth
   | depth <= 0 = (0, 0, 0)
   | anyhit la r 0.001 infty hr == True = (raycolour la newray hr rvecs (depth - 1)) `divscalar` 2
   | otherwise  = (mulscalar (1, 1, 1) (1 - t)) `sumv` (mulscalar (0.5, 0.7, 1.0) t)
-  where newhr = anyhitrec la r 0 infty hr
+  where newhr = anyhitrec la r 0.001 infty hr
         rvec = rvecs !! (depth - 1)
         target = ((normal newhr) `sumv` (p newhr)) `sumv` rvec
         newray = Ray (p newhr) (target `subv` (p newhr))
@@ -73,7 +73,7 @@ mappedgrad array = sequenceA (map (\arg -> gradient arg) array)
 
 
 ppmHeader file = do
-                 writeFile file ("P3\n" ++ show (round image_width) ++ " " ++ show (round image_height))
+                 writeFile file ("P3\n" ++ show image_width ++ " " ++ show image_height)
                  appendFile file ("\n" ++ show (round max_colour) ++ "\n")
 
 -- Main function 
@@ -84,11 +84,12 @@ main = do
        -- Set pixels
        let colour_gradx = [0..image_width - 1]
            colour_grady = [0..image_height - 1]
-           elements = [(x / (image_width - 1), y / (image_height - 1)) | y <- reverse colour_grady, x <- colour_gradx]
+           widthDen = fromIntegral (image_width - 1)
+           heightDen = fromIntegral (image_height - 1)
+           elements = [(fromIntegral x / widthDen, fromIntegral y / heightDen) | y <- reverse colour_grady, x <- colour_gradx]
        
        -- A little bit of dark magic    
        mgrad <- mappedgrad elements
 
        appendFile "test.ppm" (unlines mgrad)
        putStrLn "ppm file created!"
-

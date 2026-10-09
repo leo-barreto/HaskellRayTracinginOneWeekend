@@ -65,7 +65,9 @@ randomvec (min, max) = do
 randomuvec :: IO Vec3
 randomuvec = do
              v <- randomvec(-1.0, 1.0)
-             return (unitv v)
+             if norm v < 1e-12
+               then randomuvec
+               else return (unitv v)
 
 
 -- Colour definition
@@ -89,4 +91,3 @@ clamp x lower upper
   | x < lower = lower
   | x > upper = upper
   | otherwise = x
-
